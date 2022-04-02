@@ -1,11 +1,7 @@
 class TaskList {
   List<Task> list = List.empty(growable: true);
 
-  TaskList() {
-    list.add(Task(text: "Go on lesson", state: TaskState.wait));
-    list.add(Task(text: "Go in library", state: TaskState.wait));
-    list.add(Task(text: "Go to sleep", state: TaskState.wait));
-  }
+  TaskList();
 
   void addTask(String text, TaskState state, DateTime? time) {
     list.add(Task(text: text, time: time, state: TaskState.wait));
@@ -13,6 +9,10 @@ class TaskList {
 
   int count() {
     return list.length;
+  }
+
+  Task last() {
+    return list.last;
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:task_planner/TaskList.dart';
 
@@ -35,13 +36,10 @@ class TaskDB {
 
   Future<TaskList> getAllTasks() async {
     Database database = await db;
-    List<Map> maps = await database.query(tableTask,
-        columns: [columnId, columnText, columnTime, columnState],
-        orderBy: "$columnTime desc");
+    List<Map> maps = await database.query(tableTask, columns: [columnId, columnText, columnTime, columnState], orderBy: "$columnTime desc");
     TaskList list = TaskList();
     for (var map in maps) {
-      list.addTask(
-          map[columnText], TaskState.values[map[columnState]], map[columnTime]);
+      list.addTask(map[columnText], TaskState.values[map[columnState]], map[columnTime] == null ? null : DateTime.parse(map[columnTime]));
     }
     return list;
   }
@@ -50,7 +48,7 @@ class TaskDB {
     Database? database = await db;
     int id = await database.insert(tableTask, <String, Object?>{
       columnText: task.text,
-      columnTime: task.time,
+      columnTime: task.time == null ? null : DateFormat('yyyy-MM-dd HH:mm').format(task.time!),
       columnState: task.state.index,
     });
     return id;
