@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:task_planner/TaskDB.dart';
 import 'package:task_planner/TaskList.dart';
 import 'AddTaskScreen.dart';
@@ -37,6 +38,18 @@ class MainScreenState extends State<MainScreen> {
     // list = await db.getAllTasks();
   }
 
+  void editTask() async {}
+
+  TextStyle taskStateToColor(TaskState state) {
+    if (state == TaskState.wait) {
+      return const TextStyle(color: Colors.deepOrange);
+    } else if (state == TaskState.inProgress) {
+      return const TextStyle(color: Colors.green);
+    } else {
+      return const TextStyle(decoration: TextDecoration.lineThrough);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Future<TaskList> _futureList = initDb();
@@ -51,10 +64,21 @@ class MainScreenState extends State<MainScreen> {
             appBar: AppBar(
               title: const Text("Task list"),
             ),
-            body: ListView.builder(
+            body: ListView.separated(
+                separatorBuilder: (BuildContext context, int index) => const Divider(),
                 itemCount: list.count(),
                 itemBuilder: (context, index) {
-                  return Text(list.list[index].text);
+                  return Container(
+                      alignment: Alignment.center,
+                      height: 50.0,
+                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
+                        Text(list.list[index].text, style: taskStateToColor(list.list[index].state)),
+                        Text(
+                          list.list[index].time == null ? '' : DateFormat('yyyy-MM-dd HH:mm').format(list.list[index].time!),
+                        ),
+                        IconButton(onPressed: editTask, icon: const Icon(Icons.edit))
+                      ]));
+                  // Text(list.list[index].text);
                 }),
             persistentFooterButtons: [
               FloatingActionButton(
