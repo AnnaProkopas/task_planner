@@ -31,12 +31,15 @@ class AddTaskScreenState extends State<AddTaskScreen> {
             child: Column(
               children: [
                 TextFormField(
-                  initialValue: '',
+                  initialValue: taskText,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter some text';
                     }
                     return null;
+                  },
+                  onChanged: (value) {
+                    taskText = value;
                   },
                   onSaved: (value) {
                     setState(() => taskText = value!);
