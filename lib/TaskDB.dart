@@ -39,7 +39,8 @@ class TaskDB {
     List<Map> maps = await database.query(tableTask, columns: [columnId, columnText, columnTime, columnState], orderBy: "$columnTime desc");
     TaskList list = TaskList();
     for (var map in maps) {
-      list.addTask(map[columnText], TaskState.values[map[columnState]], map[columnTime] == null ? null : DateTime.parse(map[columnTime]));
+      list.addTask(
+          map[columnId], map[columnText], TaskState.values[map[columnState]], map[columnTime] == null ? null : DateTime.parse(map[columnTime]));
     }
     return list;
   }
@@ -51,6 +52,20 @@ class TaskDB {
       columnTime: task.time == null ? null : DateFormat('yyyy-MM-dd HH:mm').format(task.time!),
       columnState: task.state.index,
     });
+    return id;
+  }
+
+  Future<int> update(Task task) async {
+    Database? database = await db;
+    int id = await database.update(
+        tableTask,
+        <String, Object?>{
+          columnText: task.text,
+          columnTime: task.time == null ? null : DateFormat('yyyy-MM-dd HH:mm').format(task.time!),
+          columnState: task.state.index,
+        },
+        where: '$columnId = ?',
+        whereArgs: [task.id]);
     return id;
   }
 }

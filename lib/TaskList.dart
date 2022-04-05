@@ -3,8 +3,8 @@ class TaskList {
 
   TaskList();
 
-  void addTask(String text, TaskState state, DateTime? time) {
-    list.add(Task(text: text, time: time, state: TaskState.wait));
+  void addTask(int? id, String text, TaskState state, DateTime? time) {
+    list.add(Task(id: id, text: text, time: time, state: TaskState.wait));
   }
 
   int count() {
@@ -14,11 +14,20 @@ class TaskList {
   Task last() {
     return list.last;
   }
+
+  void add(Task task) {
+    list.add(task);
+  }
+
+  void update(int index, Task task) {
+    list[index] = task;
+  }
 }
 
 class Task {
-  Task({required this.text, required this.state, this.time});
+  Task({this.id, required this.text, required this.state, this.time});
 
+  int? id;
   String text = '';
   DateTime? time;
   TaskState state = TaskState.wait;
