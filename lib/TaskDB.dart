@@ -36,7 +36,8 @@ class TaskDB {
 
   Future<TaskList> getAllTasks() async {
     Database database = await db;
-    List<Map> maps = await database.query(tableTask, columns: [columnId, columnText, columnTime, columnState], orderBy: "$columnTime desc");
+    List<Map> maps =
+        await database.query(tableTask, columns: [columnId, columnText, columnTime, columnState], orderBy: "$columnState asc, $columnId asc");
     TaskList list = TaskList();
     for (var map in maps) {
       list.addTask(
@@ -67,5 +68,10 @@ class TaskDB {
         where: '$columnId = ?',
         whereArgs: [task.id]);
     return id;
+  }
+
+  void delete(Task task) async {
+    Database? database = await db;
+    database.delete(tableTask, where: '$columnId = ?', whereArgs: [task.id]);
   }
 }

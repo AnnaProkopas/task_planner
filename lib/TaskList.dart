@@ -22,6 +22,10 @@ class TaskList {
   void update(int index, Task task) {
     list[index] = task;
   }
+
+  void removeAt(int index) {
+    list.removeAt(index);
+  }
 }
 
 class Task {

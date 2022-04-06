@@ -58,6 +58,42 @@ class MainScreenState extends State<MainScreen> {
     }
   }
 
+  void deleteTask(BuildContext context, int index) async {
+    Widget cancelButton = TextButton(
+      child: const Text("Cancel"),
+      onPressed: () {
+        Navigator.of(context).pop(false);
+      },
+    );
+    Widget continueButton = TextButton(
+      child: const Text("Continue"),
+      onPressed: () {
+        Task deletedTask = list.list[index];
+        setState(() {
+          list.removeAt(index);
+        });
+        Navigator.of(context).pop(true);
+        db.delete(deletedTask);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: const Text("Submit delete"),
+      content: Text("Are you sure you want to delete the \"" + list.list[index].text + "\" task?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   TextStyle taskStateToColor(TaskState state) {
     if (state == TaskState.wait) {
       return const TextStyle(color: Colors.deepOrange);
@@ -84,20 +120,26 @@ class MainScreenState extends State<MainScreen> {
           separatorBuilder: (BuildContext context, int index) => const Divider(),
           itemCount: list.count(),
           itemBuilder: (context, index) {
-            return Container(
-                alignment: Alignment.center,
-                height: 50.0,
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
-                  Text(list.list[index].text, style: taskStateToColor(list.list[index].state)),
-                  Text(
-                    list.list[index].time == null ? '' : DateFormat('yyyy-MM-dd HH:mm').format(list.list[index].time!),
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        editTask(index);
-                      },
-                      icon: const Icon(Icons.edit))
-                ]));
+            return ListTile(
+                title: Text(
+                  list.list[index].time == null ? '' : DateFormat('yyyy-MM-dd HH:mm').format(list.list[index].time!),
+                ),
+                subtitle: Text(list.list[index].text, style: taskStateToColor(list.list[index].state)),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          editTask(index);
+                        },
+                        icon: const Icon(Icons.edit)),
+                    IconButton(
+                        onPressed: () {
+                          deleteTask(context, index);
+                        },
+                        icon: const Icon(Icons.delete)),
+                  ],
+                ));
           }),
       persistentFooterButtons: [
         FloatingActionButton(
