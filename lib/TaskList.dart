@@ -3,8 +3,8 @@ class TaskList {
 
   TaskList();
 
-  void addTask(int? id, String text, TaskState state, DateTime? time) {
-    list.add(Task(id: id, text: text, time: time, state: TaskState.wait));
+  void addTask(int? id, String text, TaskState state, DateTime? time, bool? isNotify) {
+    list.add(Task(id: id, text: text, time: time, state: TaskState.wait, isNotify: isNotify ?? false));
   }
 
   int count() {
@@ -29,12 +29,13 @@ class TaskList {
 }
 
 class Task {
-  Task({this.id, required this.text, required this.state, this.time});
+  Task({this.id, required this.text, required this.state, this.time, this.isNotify = false});
 
   int? id;
   String text = '';
   DateTime? time;
   TaskState state = TaskState.wait;
+  bool isNotify = false;
 }
 
 enum TaskState {

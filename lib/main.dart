@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:task_planner/TaskDB.dart';
 import 'package:task_planner/TaskList.dart';
+import 'package:timezone/browser.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 import 'AddTaskScreen.dart';
 import 'EditTaskScreen.dart';
 import 'LoadingScreen.dart';
+
+final localNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 void main() {
   runApp(MaterialApp(title: "Task planner", home: MainScreen(), routes: {
@@ -24,6 +30,7 @@ class MainScreen extends StatefulWidget {
 class MainScreenState extends State<MainScreen> {
   TaskList list = TaskList();
   TaskDB db = TaskDB();
+  // String currentTimeZoneName = 'Asia/Vladivostok';
 
   Future<void> initDb() async {
     await db.init();
@@ -94,6 +101,36 @@ class MainScreenState extends State<MainScreen> {
     );
   }
 
+  void showNotification(int index) async {
+    var notificationDetails = const NotificationDetails(
+        android: AndroidNotificationDetails(
+      'My channel id',
+      'My channel',
+      channelDescription: 'Description',
+      channelShowBadge: true,
+      priority: Priority.high,
+      importance: Importance.max,
+    ));
+
+    Task task = list.list[index];
+
+    if (!task.isNotify && task.time != null && task.time!.isAfter(DateTime.now())) {
+      await localNotificationsPlugin.zonedSchedule(task.id!, 'Task time', task.text,
+          TZDateTime.now(tz.local).add(Duration(seconds: task.time!.difference(DateTime.now()).inSeconds)), notificationDetails,
+          uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime, androidAllowWhileIdle: true);
+
+      setState(() {
+        list.list[index].isNotify = true;
+      });
+    } else {
+      await localNotificationsPlugin.cancel(task.id!);
+
+      setState(() {
+        list.list[index].isNotify = false;
+      });
+    }
+  }
+
   TextStyle taskStateToColor(TaskState state) {
     if (state == TaskState.wait) {
       return const TextStyle(color: Colors.deepOrange);
@@ -104,10 +141,17 @@ class MainScreenState extends State<MainScreen> {
     }
   }
 
+  void iniTimeZone() async {
+    // currentTimeZoneName = await FlutterNativeTimezone.getLocalTimezone();
+    tz.initializeTimeZones();
+    tz.setLocalLocation(tz.local);
+  }
+
   @override
   void initState() {
     super.initState();
     initDb();
+    iniTimeZone();
   }
 
   @override
@@ -129,15 +173,37 @@ class MainScreenState extends State<MainScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
+                      onPressed: null,
+                      // list.list[index].time == null
+                      //     ? null
+                      //     : () {
+                      //         showNotification(index);
+                      //       },
+                      icon: list.list[index].isNotify
+                          ? const Icon(
+                              Icons.notifications_active,
+                              color: Colors.black,
+                            )
+                          : const Icon(
+                              Icons.notifications_off,
+                            ),
+                    ),
+                    IconButton(
                         onPressed: () {
                           editTask(index);
                         },
-                        icon: const Icon(Icons.edit)),
+                        icon: const Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        )),
                     IconButton(
                         onPressed: () {
                           deleteTask(context, index);
                         },
-                        icon: const Icon(Icons.delete)),
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Colors.black,
+                        )),
                   ],
                 ));
           }),

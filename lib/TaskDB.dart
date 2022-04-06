@@ -7,6 +7,7 @@ const String columnId = 'id';
 const String columnText = 'text';
 const String columnTime = 'time';
 const String columnState = 'state';
+const String columnIsNotify = 'isNotify';
 
 class TaskDB {
   Database? _db;
@@ -26,7 +27,8 @@ class TaskDB {
               $columnId INTEGER PRIMARY KEY AUTOINCREMENT, 
               $columnText TEXT not null, 
               $columnTime TEXT, 
-              $columnState INTEGER not null);
+              $columnState INTEGER not null,
+              $columnIsNotify BOOLEAN not null);
             ''');
       },
     );
@@ -36,12 +38,12 @@ class TaskDB {
 
   Future<TaskList> getAllTasks() async {
     Database database = await db;
-    List<Map> maps =
-        await database.query(tableTask, columns: [columnId, columnText, columnTime, columnState], orderBy: "$columnState asc, $columnId asc");
+    List<Map> maps = await database.query(tableTask,
+        columns: [columnId, columnText, columnTime, columnState, columnIsNotify], orderBy: "$columnState asc, $columnId asc");
     TaskList list = TaskList();
     for (var map in maps) {
-      list.addTask(
-          map[columnId], map[columnText], TaskState.values[map[columnState]], map[columnTime] == null ? null : DateTime.parse(map[columnTime]));
+      list.addTask(map[columnId], map[columnText], TaskState.values[map[columnState]],
+          map[columnTime] == null ? null : DateTime.parse(map[columnTime]), map[columnIsNotify] > 0);
     }
     return list;
   }
@@ -52,6 +54,7 @@ class TaskDB {
       columnText: task.text,
       columnTime: task.time == null ? null : DateFormat('yyyy-MM-dd HH:mm').format(task.time!),
       columnState: task.state.index,
+      columnIsNotify: task.isNotify ? 1 : 0,
     });
     return id;
   }
@@ -64,6 +67,7 @@ class TaskDB {
           columnText: task.text,
           columnTime: task.time == null ? null : DateFormat('yyyy-MM-dd HH:mm').format(task.time!),
           columnState: task.state.index,
+          columnIsNotify: task.isNotify ? 1 : 0,
         },
         where: '$columnId = ?',
         whereArgs: [task.id]);
