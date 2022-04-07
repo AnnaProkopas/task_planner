@@ -111,7 +111,7 @@ class EditTaskScreenState extends State<EditTaskScreen> {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3)), color: Color(0xFFF2F2F2)),
+                  decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3)), color: Color(0xFFFFFFFF)),
                   child: Theme(
                     data: Theme.of(context).copyWith(
                         canvasColor: const Color(0xFFFFFFFF),

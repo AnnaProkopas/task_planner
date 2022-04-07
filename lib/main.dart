@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:intl/intl.dart';
 import 'package:task_planner/TaskDB.dart';
 import 'package:task_planner/TaskList.dart';
-import 'package:timezone/browser.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/data/latest_10y.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'AddTaskScreen.dart';
 import 'EditTaskScreen.dart';
@@ -30,7 +30,7 @@ class MainScreen extends StatefulWidget {
 class MainScreenState extends State<MainScreen> {
   TaskList list = TaskList();
   TaskDB db = TaskDB();
-  // String currentTimeZoneName = 'Asia/Vladivostok';
+  late tz.Location local;
 
   Future<void> initDb() async {
     await db.init();
@@ -104,7 +104,7 @@ class MainScreenState extends State<MainScreen> {
   void showNotification(int index) async {
     var notificationDetails = const NotificationDetails(
         android: AndroidNotificationDetails(
-      'My channel id',
+      '123456',
       'My channel',
       channelDescription: 'Description',
       channelShowBadge: true,
@@ -116,7 +116,7 @@ class MainScreenState extends State<MainScreen> {
 
     if (!task.isNotify && task.time != null && task.time!.isAfter(DateTime.now())) {
       await localNotificationsPlugin.zonedSchedule(task.id!, 'Task time', task.text,
-          TZDateTime.now(tz.local).add(Duration(seconds: task.time!.difference(DateTime.now()).inSeconds)), notificationDetails,
+          tz.TZDateTime.now(tz.local).add(Duration(seconds: task.time!.difference(DateTime.now()).inSeconds)), notificationDetails,
           uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime, androidAllowWhileIdle: true);
 
       setState(() {
@@ -142,9 +142,9 @@ class MainScreenState extends State<MainScreen> {
   }
 
   void iniTimeZone() async {
-    // currentTimeZoneName = await FlutterNativeTimezone.getLocalTimezone();
+    String currentTimeZoneName = await FlutterNativeTimezone.getLocalTimezone();
     tz.initializeTimeZones();
-    tz.setLocalLocation(tz.local);
+    local = tz.getLocation(currentTimeZoneName);
   }
 
   @override
