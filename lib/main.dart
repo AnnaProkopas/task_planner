@@ -30,7 +30,6 @@ class MainScreen extends StatefulWidget {
 class MainScreenState extends State<MainScreen> {
   TaskList list = TaskList();
   TaskDB db = TaskDB();
-  late tz.Location local;
 
   Future<void> initDb() async {
     await db.init();
@@ -58,6 +57,10 @@ class MainScreenState extends State<MainScreen> {
     final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => EditTaskScreen(list.list[index])));
     if (result != null) {
       result as Task;
+      if (result.time != list.list[index].time && list.list[index].isNotify) {
+        localNotificationsPlugin.cancel(result.id!);
+        result.isNotify = false;
+      }
       setState(() {
         list.update(index, result);
       });
@@ -110,6 +113,7 @@ class MainScreenState extends State<MainScreen> {
       channelShowBadge: true,
       priority: Priority.high,
       importance: Importance.max,
+      icon: "meditation_icon_background",
     ));
 
     Task task = list.list[index];
@@ -142,9 +146,7 @@ class MainScreenState extends State<MainScreen> {
   }
 
   void iniTimeZone() async {
-    String currentTimeZoneName = await FlutterNativeTimezone.getLocalTimezone();
     tz.initializeTimeZones();
-    local = tz.getLocation(currentTimeZoneName);
   }
 
   @override
@@ -173,12 +175,11 @@ class MainScreenState extends State<MainScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      onPressed: null,
-                      // list.list[index].time == null
-                      //     ? null
-                      //     : () {
-                      //         showNotification(index);
-                      //       },
+                      onPressed: list.list[index].time == null
+                          ? null
+                          : () {
+                              showNotification(index);
+                            },
                       icon: list.list[index].isNotify
                           ? const Icon(
                               Icons.notifications_active,
@@ -186,6 +187,7 @@ class MainScreenState extends State<MainScreen> {
                             )
                           : const Icon(
                               Icons.notifications_off,
+                              color: Colors.black,
                             ),
                     ),
                     IconButton(
