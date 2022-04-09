@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:intl/intl.dart';
 import 'package:task_planner/TaskDB.dart';
 import 'package:task_planner/TaskList.dart';
@@ -160,7 +159,6 @@ class MainScreenState extends State<MainScreen> {
   }
 
   bool canAddNotification(Task task) {
-    print(task.time != null && task.time!.isAfter(DateTime.now().add(const Duration(minutes: 1))));
     return task.time != null && task.time!.isAfter(DateTime.now().add(const Duration(minutes: 1)));
   }
 

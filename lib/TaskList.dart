@@ -6,7 +6,7 @@ class TaskList {
   TaskList();
 
   void addTask(int? id, String text, TaskState state, DateTime? time, bool? isNotify) {
-    list.add(Task(id: id, text: text, time: time, state: TaskState.wait, isNotify: isNotify ?? false));
+    list.add(Task(id: id, text: text, time: time, state: state, isNotify: isNotify ?? false));
   }
 
   int count() {

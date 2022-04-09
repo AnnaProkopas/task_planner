@@ -16,6 +16,7 @@ class EditTaskScreen extends StatefulWidget {
 }
 
 class EditTaskScreenState extends State<EditTaskScreen> {
+  final _formKey = GlobalKey<FormState>();
   Task task;
   String taskText = '';
   DateTime? taskTime;
@@ -33,8 +34,6 @@ class EditTaskScreenState extends State<EditTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-
     return Scaffold(
         appBar: AppBar(
           title: const Text("Edit task"),
