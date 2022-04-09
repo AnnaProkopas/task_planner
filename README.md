@@ -1,6 +1,8 @@
 # task_planner
 
-A new Flutter project.
+View tasks | Edit task | Delete task | Use notification |
+ --| -- | -- | --
+ ![](screenshots/1.jpg) | ![](screenshots/2.jpg) | ![](screenshots/3.jpg) | ![](screenshots/4.jpg)
 
 ## Getting Started
 
