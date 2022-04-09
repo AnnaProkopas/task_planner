@@ -195,6 +195,7 @@ class MainScreenState extends State<MainScreen> {
                 ),
                 title: Text(
                   list.list[index].time == null ? '' : DateFormat('yyyy-MM-dd HH:mm').format(list.list[index].time!),
+                  style: taskStateToTextStyle(list.list[index].state),
                 ),
                 subtitle: Text(list.list[index].text, style: taskStateToTextStyle(list.list[index].state)),
                 trailing: Row(
