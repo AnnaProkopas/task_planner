@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class TaskList {
   List<Task> list = List.empty(growable: true);
 
@@ -43,3 +45,15 @@ enum TaskState {
   inProgress,
   done,
 }
+
+const Map<TaskState, String> taskStateToEnText = {TaskState.wait: 'Wait', TaskState.inProgress: 'In progress', TaskState.done: 'Done'};
+const Map<TaskState, IconData> taskStateToIcon = {
+  TaskState.wait: Icons.access_time,
+  TaskState.inProgress: Icons.directions_run,
+  TaskState.done: Icons.done
+};
+const Map<TaskState, Color> taskStateToColor = {
+  TaskState.wait: Colors.deepOrangeAccent,
+  TaskState.inProgress: Colors.green,
+  TaskState.done: Colors.blueGrey
+};

@@ -111,16 +111,16 @@ class EditTaskScreenState extends State<EditTaskScreen> {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3)), color: Color(0xFFFFFFFF)),
+                  decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(3)), color: Colors.white),
                   child: Theme(
                     data: Theme.of(context).copyWith(
-                        canvasColor: const Color(0xFFFFFFFF),
+                        canvasColor: Colors.white,
                         buttonTheme: ButtonTheme.of(context).copyWith(
                           alignedDropdown: true,
                         )),
                     child: DropdownButton<TaskState>(
                       value: taskState,
-                      elevation: 16,
+                      elevation: 1,
                       onChanged: (TaskState? newValue) {
                         setState(() {
                           taskState = newValue!;
@@ -129,7 +129,7 @@ class EditTaskScreenState extends State<EditTaskScreen> {
                       items: TaskState.values.map<DropdownMenuItem<TaskState>>((TaskState value) {
                         return DropdownMenuItem<TaskState>(
                           value: value,
-                          child: Text(value.toString()),
+                          child: Text(taskStateToEnText[value]!),
                         );
                       }).toList(),
                     ),

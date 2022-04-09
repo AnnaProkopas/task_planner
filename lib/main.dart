@@ -68,6 +68,20 @@ class MainScreenState extends State<MainScreen> {
     }
   }
 
+  void setNextState(int index) async {
+    TaskState nextState = TaskState.wait;
+    if (list.list[index].state == TaskState.wait) {
+      nextState = TaskState.inProgress;
+    } else if (list.list[index].state == TaskState.inProgress) {
+      nextState = TaskState.done;
+    }
+
+    setState(() {
+      list.list[index].state = nextState;
+    });
+    db.update(list.list[index]);
+  }
+
   void deleteTask(BuildContext context, int index) async {
     Widget cancelButton = TextButton(
       child: const Text("Cancel"),
@@ -78,6 +92,9 @@ class MainScreenState extends State<MainScreen> {
     Widget continueButton = TextButton(
       child: const Text("Continue"),
       onPressed: () {
+        if (list.list[index].isNotify) {
+          localNotificationsPlugin.cancel(list.list[index].id!);
+        }
         Task deletedTask = list.list[index];
         setState(() {
           list.removeAt(index);
@@ -135,14 +152,16 @@ class MainScreenState extends State<MainScreen> {
     }
   }
 
-  TextStyle taskStateToColor(TaskState state) {
-    if (state == TaskState.wait) {
-      return const TextStyle(color: Colors.deepOrange);
-    } else if (state == TaskState.inProgress) {
-      return const TextStyle(color: Colors.green);
-    } else {
+  TextStyle taskStateToTextStyle(TaskState state) {
+    if (state == TaskState.done) {
       return const TextStyle(decoration: TextDecoration.lineThrough);
     }
+    return const TextStyle();
+  }
+
+  bool canAddNotification(Task task) {
+    print(task.time != null && task.time!.isAfter(DateTime.now().add(const Duration(minutes: 1))));
+    return task.time != null && task.time!.isAfter(DateTime.now().add(const Duration(minutes: 1)));
   }
 
   void iniTimeZone() async {
@@ -167,27 +186,34 @@ class MainScreenState extends State<MainScreen> {
           itemCount: list.count(),
           itemBuilder: (context, index) {
             return ListTile(
+                leading: IconButton(
+                  icon: Icon(taskStateToIcon[list.list[index].state]!),
+                  color: taskStateToColor[list.list[index].state]!,
+                  onPressed: () {
+                    setNextState(index);
+                  },
+                ),
                 title: Text(
                   list.list[index].time == null ? '' : DateFormat('yyyy-MM-dd HH:mm').format(list.list[index].time!),
                 ),
-                subtitle: Text(list.list[index].text, style: taskStateToColor(list.list[index].state)),
+                subtitle: Text(list.list[index].text, style: taskStateToTextStyle(list.list[index].state)),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      onPressed: list.list[index].time == null
-                          ? null
-                          : () {
+                      onPressed: canAddNotification(list.list[index])
+                          ? () {
                               showNotification(index);
-                            },
+                            }
+                          : null,
                       icon: list.list[index].isNotify
                           ? const Icon(
                               Icons.notifications_active,
                               color: Colors.black,
                             )
-                          : const Icon(
+                          : Icon(
                               Icons.notifications_off,
-                              color: Colors.black,
+                              color: canAddNotification(list.list[index]) ? Colors.black : Colors.blueGrey,
                             ),
                     ),
                     IconButton(
